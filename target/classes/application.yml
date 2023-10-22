@@ -7,7 +7,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/comment
+    url: jdbc:postgresql://my_postgres:5432/comment
     username: postgres
     password: mysecretpassword
   jpa:

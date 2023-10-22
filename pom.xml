@@ -89,7 +89,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>com.clodrock.sakabe.MessagingStompWebsocketApplication</mainClass>
+							<mainClass>com.clodrock.sakabe.SakaBeApplication</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
