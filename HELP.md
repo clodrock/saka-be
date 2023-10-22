@@ -1,7 +1,7 @@
 # Read Me First
 The following was discovered as part of building this project:
 
-* The original package name 'com.clodrock.messaging-stomp-websocket' is invalid and this project uses 'com.clodrock.messagingstompwebsocket' instead.
+* The original package name 'com.clodrock.messaging-stomp-websocket' is invalid and this project uses 'com.clodrock.sakabe' instead.
 
 # Getting Started
 

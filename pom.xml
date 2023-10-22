@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.clodrock</groupId>
 	<artifactId>saka</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<name>messaging-stomp-websocket</name>
 	<description>KSG Retrospective</description>
 	<packaging>jar</packaging>
@@ -89,7 +89,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>com.clodrock.messagingstompwebsocket.MessagingStompWebsocketApplication</mainClass>
+							<mainClass>com.clodrock.sakabe.MessagingStompWebsocketApplication</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
