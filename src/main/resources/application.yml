@@ -1,0 +1,18 @@
+info:
+  app:
+    version: ^project.version^
+
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/comment
+    username: postgres
+    password: mysecretpassword
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
