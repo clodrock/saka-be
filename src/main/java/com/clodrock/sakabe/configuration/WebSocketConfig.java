@@ -17,16 +17,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/gs-guide-websocket", "/ws").withSockJS();
-    }
-
-    @Bean
-    public WebSocketConfigurer corsConfigurer() {
-        return registry -> registry.addHandler(myHandler(), "/ws", "/gs-guide-websocket");
-    }
-
-    @Bean
-    public WebSocketHandler myHandler() {
-        return new MyHandler();
+        registry.addEndpoint("/ws").setAllowedOrigins("http://localhost:4200").withSockJS();
     }
 }

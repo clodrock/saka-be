@@ -1,8 +1,18 @@
 package com.clodrock.sakabe.model;
 
 import com.clodrock.sakabe.enums.CommentType;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
-public record UserCommentResponse(Long id, String content, CommentType commentType, Long userId){
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserCommentResponse{
+    private Long id;
+    private String content;
+    private CommentType commentType;
+    private Long userId;
 }
