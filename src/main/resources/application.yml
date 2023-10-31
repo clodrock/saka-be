@@ -7,7 +7,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/comment
+    url: jdbc:postgresql://my_postgres:5432/comment
     username: postgres
     password: mysecretpassword
   jpa:
@@ -16,3 +16,6 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
+socket:
+  host : 172.19.0.3
+  port : 8092

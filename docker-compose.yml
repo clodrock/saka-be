@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  saka-be:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: saka-be
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    networks:
+      my-network:
+        ipv4_address: 172.20.0.3
+    ports:
+      - '8000:8000'
+
+networks:
+  my-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24

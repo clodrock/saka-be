@@ -5,19 +5,20 @@ import org.springframework.context.annotation.Bean;
 import com.corundumstudio.socketio.SocketIOServer;
 import org.springframework.context.annotation.Configuration;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 @Configuration
 public class SocketIOConfig {
-    @Value("${socket.port:8090}")
+    @Value("${socket.host}")
+    private String host;
+
+    @Value("${socket.port}")
     private int port;
 
     @Bean
-    public SocketIOServer socketIOServer() throws UnknownHostException {
-        InetAddress locIP = InetAddress.getByName("127.0.0.1");
+    public SocketIOServer socketIOServer(){
         com.corundumstudio.socketio.Configuration config = new com.corundumstudio.socketio.Configuration();
-        config.setHostname(locIP.getHostName());
+        config.setHostname(host);
         config.setPort(port);
         return new SocketIOServer(config);
     }
