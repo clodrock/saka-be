@@ -2,7 +2,7 @@ package com.clodrock.sakabe.mapper;
 
 import com.clodrock.sakabe.entity.Comment;
 import com.clodrock.sakabe.model.UserCommentResponse;
-import com.clodrock.sakabe.model.UserCommentSaveRequest;
+import com.clodrock.sakabe.model.UserCommentRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 
@@ -10,5 +10,5 @@ import org.mapstruct.MappingConstants;
 public interface CommentMapper {
     UserCommentResponse toUserComment(Comment comment);
 
-    Comment toComment(UserCommentSaveRequest comment);
+    Comment toComment(UserCommentRequest comment);
 }

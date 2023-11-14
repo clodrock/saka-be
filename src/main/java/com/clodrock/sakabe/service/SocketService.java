@@ -1,8 +1,7 @@
 package com.clodrock.sakabe.service;
 
+import com.clodrock.sakabe.model.UserCommentRequest;
 import com.clodrock.sakabe.model.UserCommentResponse;
-import com.clodrock.sakabe.model.UserCommentSaveRequest;
-import com.clodrock.sakabe.model.UserCommentUpdateRequest;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
@@ -21,15 +20,15 @@ public class SocketService {
         this.commentService = commentService;
         socketIoServer.addConnectListener(onConnected());
         socketIoServer.addDisconnectListener(onDisconnected());
-        socketIoServer.addEventListener("send_message", UserCommentSaveRequest.class, onCommentReceived());
-        socketIoServer.addEventListener("delete_message", Long.class, onCommentDeleted());
-        socketIoServer.addEventListener("update_message", UserCommentUpdateRequest.class, onCommentUpdated());
+        socketIoServer.addEventListener("send_message", UserCommentRequest.class, onCommentReceived());
+        socketIoServer.addEventListener("delete_message", UserCommentRequest.class, onCommentDeleted());
+        socketIoServer.addEventListener("update_message", UserCommentRequest.class, onCommentUpdated());
     }
 
-    private DataListener<UserCommentSaveRequest> onCommentReceived() {
+    private DataListener<UserCommentRequest> onCommentReceived() {
         return (senderClient, data, ackSender) -> {
             UserCommentResponse userCommentResponse = commentService.saveComment(
-                    UserCommentSaveRequest
+                    UserCommentRequest
                             .builder()
                             .commentType(data.getCommentType())
                             .content(data.getContent())
@@ -40,18 +39,22 @@ public class SocketService {
         };
     }
 
-    private DataListener<Long> onCommentDeleted() {
+    private DataListener<UserCommentRequest> onCommentDeleted() {
         return (senderClient, data, ackSender) -> {
+            UserCommentResponse userComment = commentService.findById(data.getId());
+            commentService.deleteById(data.getId());
+            data.setCommentType(userComment.getCommentType());
+            data.setContent(userComment.getContent());
+            data.setUserId(userComment.getUserId());
             senderClient.getNamespace().getBroadcastOperations().sendEvent("deleted_message", data);
-            commentService.deleteById(data);
         };
     }
 
-    private DataListener<UserCommentUpdateRequest> onCommentUpdated() {
+    private DataListener<UserCommentRequest> onCommentUpdated() {
         return (senderClient, data, ackSender) -> {
             senderClient.getNamespace().getBroadcastOperations().sendEvent("updated_message", data);
             commentService.update(
-                    UserCommentUpdateRequest
+                    UserCommentRequest
                             .builder()
                             .commentType(data.getCommentType())
                             .content(data.getContent())

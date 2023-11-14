@@ -1,8 +1,6 @@
 package com.clodrock.sakabe.controller;
 
 import com.clodrock.sakabe.model.UserCommentResponse;
-import com.clodrock.sakabe.model.UserCommentSaveRequest;
-import com.clodrock.sakabe.model.UserCommentUpdateRequest;
 import com.clodrock.sakabe.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

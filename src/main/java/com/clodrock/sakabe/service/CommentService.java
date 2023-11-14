@@ -1,10 +1,10 @@
 package com.clodrock.sakabe.service;
 
 import com.clodrock.sakabe.entity.Comment;
+import com.clodrock.sakabe.exception.NotFoundException;
 import com.clodrock.sakabe.mapper.CommentMapper;
 import com.clodrock.sakabe.model.UserCommentResponse;
-import com.clodrock.sakabe.model.UserCommentSaveRequest;
-import com.clodrock.sakabe.model.UserCommentUpdateRequest;
+import com.clodrock.sakabe.model.UserCommentRequest;
 import com.clodrock.sakabe.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class CommentService {
     private final CommentRepository repository;
     private final CommentMapper mapper;
 
-    public UserCommentResponse saveComment(UserCommentSaveRequest comment) {
+    public UserCommentResponse saveComment(UserCommentRequest comment) {
         Comment save = repository.save(mapper.toComment(comment));
         return mapper.toUserComment(save);
     }
@@ -32,12 +32,17 @@ public class CommentService {
         repository.deleteById(commentId);
     }
 
-    public void update(UserCommentUpdateRequest updateRequest) {
+    public void update(UserCommentRequest updateRequest) {
         Optional<Comment> comment = repository.findById(updateRequest.getId());
         comment.ifPresent(c-> {
             c.setCommentType(updateRequest.getCommentType());
             c.setContent(updateRequest.getContent());
             repository.save(c);
         });
+    }
+
+    public UserCommentResponse findById(Long id) {
+        Optional<Comment> comment = repository.findById(id);
+        return comment.map(mapper::toUserComment).orElseThrow(()-> new NotFoundException("Comment bulunamadı!"));
     }
 }

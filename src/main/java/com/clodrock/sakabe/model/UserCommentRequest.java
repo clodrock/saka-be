@@ -6,12 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Builder
-public class UserCommentUpdateRequest{
-    private Long id;
+public class UserCommentRequest {
     private String content;
     private CommentType commentType;
+    private Long userId;
+    private Long id;
 }
