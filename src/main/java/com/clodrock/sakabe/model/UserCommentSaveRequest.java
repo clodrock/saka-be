@@ -14,4 +14,5 @@ public class UserCommentSaveRequest{
     private String content;
     private CommentType commentType;
     private Long userId;
+    private Long id;
 }

@@ -33,11 +33,11 @@ public class CommentService {
     }
 
     public void update(UserCommentUpdateRequest updateRequest) {
-        Optional<Comment> byId = repository.findById(updateRequest.id());
-        byId.ifPresent(p-> {
-            p.setCommentType(updateRequest.commentType());
-            p.setContent(updateRequest.content());
-            repository.save(p);
+        Optional<Comment> comment = repository.findById(updateRequest.getId());
+        comment.ifPresent(c-> {
+            c.setCommentType(updateRequest.getCommentType());
+            c.setContent(updateRequest.getContent());
+            repository.save(c);
         });
     }
 }
