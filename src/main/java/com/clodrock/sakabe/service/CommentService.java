@@ -6,6 +6,7 @@ import com.clodrock.sakabe.mapper.CommentMapper;
 import com.clodrock.sakabe.model.UserCommentResponse;
 import com.clodrock.sakabe.model.UserCommentRequest;
 import com.clodrock.sakabe.repository.CommentRepository;
+import com.corundumstudio.socketio.SocketIOClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,8 @@ public class CommentService {
     private final CommentRepository repository;
     private final CommentMapper mapper;
 
-    public UserCommentResponse saveComment(UserCommentRequest comment) {
+    public UserCommentResponse saveComment(SocketIOClient client, UserCommentRequest comment) {
+
         Comment save = repository.save(mapper.toComment(comment));
         return mapper.toUserComment(save);
     }

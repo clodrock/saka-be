@@ -3,6 +3,9 @@ package com.clodrock.sakabe.service;
 import com.clodrock.sakabe.entity.SakaUser;
 import com.clodrock.sakabe.entity.Token;
 import com.clodrock.sakabe.enums.TokenType;
+import com.clodrock.sakabe.exception.NotFoundException;
+import com.clodrock.sakabe.exception.PasswordsDontMatchException;
+import com.clodrock.sakabe.exception.UserAlreadyExistException;
 import com.clodrock.sakabe.model.AuthenticationRequest;
 import com.clodrock.sakabe.model.AuthenticationResponse;
 import com.clodrock.sakabe.model.RegisterRequest;
@@ -15,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +36,14 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
+        repository.findByEmail(request.getEmail())
+                .ifPresent(existingUser -> {
+                    throw new UserAlreadyExistException("User already exists!");
+                });
+
+        if(!request.getPassword().equals(request.getPasswordAgain()))
+            throw new PasswordsDontMatchException("Passwords don't match!");
+
         var user = SakaUser.builder()
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
@@ -39,13 +52,9 @@ public class AuthenticationService {
                 .role(request.getRole())
                 .build();
 
-        SakaUser savedUser = repository.findByEmail(request.getEmail()).orElseGet(()-> repository.save(user));
-
         var jwtToken = jwtService.generateToken(user);
 
         var refreshToken = jwtService.generateRefreshToken(user);
-
-        saveUserToken(savedUser, jwtToken);
 
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
@@ -54,14 +63,16 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
+        var user = repository.findByEmail(request.getEmail())
+                .orElseThrow(()-> new NotFoundException("Username or email is not correct!"));
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
                         request.getPassword()
                 )
         );
-        var user = repository.findByEmail(request.getEmail())
-                .orElseThrow();
+
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
@@ -107,12 +118,17 @@ public class AuthenticationService {
         refreshToken = authHeader.substring(7);
         userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
+
             var user = this.repository.findByEmail(userEmail)
-                    .orElseThrow();
+                    .orElseThrow(()-> new NotFoundException("User not found!"));
+
             if (jwtService.isTokenValid(refreshToken, user)) {
                 var accessToken = jwtService.generateToken(user);
+
                 revokeAllUserTokens(user);
+
                 saveUserToken(user, accessToken);
+
                 var authResponse = AuthenticationResponse.builder()
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
@@ -120,5 +136,10 @@ public class AuthenticationService {
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }
+    }
+
+    public String getActiveUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
     }
 }

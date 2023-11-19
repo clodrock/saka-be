@@ -15,7 +15,7 @@ public class SakaBeApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SakaBeApplication.class, args);
 	}
-
+/*
 	@Bean
 	public CommandLineRunner commandLineRunner(
 			AuthenticationService service
@@ -40,5 +40,5 @@ public class SakaBeApplication {
 			System.out.println("Manager token: " + service.register(manager).getAccessToken());
 
 		};
-	}
+	}*/
 }

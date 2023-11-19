@@ -2,12 +2,16 @@ package com.clodrock.sakabe.service;
 
 import com.clodrock.sakabe.model.UserCommentRequest;
 import com.clodrock.sakabe.model.UserCommentResponse;
+import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -25,9 +29,21 @@ public class SocketService {
         socketIoServer.addEventListener("update_message", UserCommentRequest.class, onCommentUpdated());
     }
 
+    public void sendSocketMessage(SocketIOClient senderClient, UserCommentRequest userCommentRequest, String streamType) {
+        for (
+                SocketIOClient client : senderClient.getNamespace().getRoomOperations(userCommentRequest.getBoardId()).getClients()) {
+            if (!client.getSessionId().equals(senderClient.getSessionId())) {
+                client.sendEvent(streamType, userCommentRequest);
+            }
+        }
+    }
+
     private DataListener<UserCommentRequest> onCommentReceived() {
         return (senderClient, data, ackSender) -> {
+            Optional<String> isMemberOfBoard = senderClient.getAllRooms().stream().filter(p -> p.equals(data.getBoardId())).findFirst();
+
             UserCommentResponse userCommentResponse = commentService.saveComment(
+                    senderClient,
                     UserCommentRequest
                             .builder()
                             .commentType(data.getCommentType())
@@ -35,7 +51,7 @@ public class SocketService {
                             .userId(data.getUserId())
                             .build());
             data.setId(userCommentResponse.getId());
-            senderClient.getNamespace().getBroadcastOperations().sendEvent("get_message", data);
+            sendSocketMessage(senderClient,data, "get_message");
         };
     }
 
@@ -65,13 +81,23 @@ public class SocketService {
 
     private ConnectListener onConnected() {
         return (client) -> {
-            log.info("Socket ID[{}]  Connected to socket", client.getSessionId().toString());
+//            String room = client.getHandshakeData().getSingleUrlParam("room");
+//            String username = client.getHandshakeData().getSingleUrlParam("room");
+            var params = client.getHandshakeData().getUrlParams();
+            String room = String.join("", params.get("room"));
+            String username = String.join("", params.get("username"));
+            client.joinRoom(room);
+            log.info("Socket ID[{}] - room[{}] - username [{}]  Connected to chat module through", client.getSessionId().toString(), room, username);
         };
+
     }
 
     private DisconnectListener onDisconnected() {
         return client -> {
-            log.info("Client[{}] - Disconnected from socket", client.getSessionId().toString());
+            var params = client.getHandshakeData().getUrlParams();
+            String room = String.join("", params.get("room"));
+            String username = String.join("", params.get("username"));
+            log.info("Socket ID[{}] - room[{}] - username [{}]  discnnected to chat module through", client.getSessionId().toString(), room, username);
         };
     }
 

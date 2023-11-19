@@ -1,13 +1,8 @@
 package com.clodrock.sakabe.entity;
 
 import com.clodrock.sakabe.enums.Role;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -38,6 +33,12 @@ public class SakaUser implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
+
+    @ManyToMany(mappedBy = "userList")
+    private List<Board> boards;
+
+    @ManyToMany(mappedBy = "ownerList")
+    private List<Board> ownership;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
