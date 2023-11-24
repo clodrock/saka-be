@@ -49,6 +49,7 @@ public class SocketService {
                             .commentType(data.getCommentType())
                             .content(data.getContent())
                             .userId(data.getUserId())
+                            .boardId(data.getBoardId())
                             .build());
             data.setId(userCommentResponse.getId());
             sendSocketMessage(senderClient,data, "get_message");
@@ -75,14 +76,13 @@ public class SocketService {
                             .commentType(data.getCommentType())
                             .content(data.getContent())
                             .id(data.getId())
+                            .boardId(data.getBoardId())
                             .build());
         };
     }
 
     private ConnectListener onConnected() {
         return (client) -> {
-//            String room = client.getHandshakeData().getSingleUrlParam("room");
-//            String username = client.getHandshakeData().getSingleUrlParam("room");
             var params = client.getHandshakeData().getUrlParams();
             String room = String.join("", params.get("room"));
             String username = String.join("", params.get("username"));
