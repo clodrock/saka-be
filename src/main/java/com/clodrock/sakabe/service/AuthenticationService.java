@@ -3,6 +3,7 @@ package com.clodrock.sakabe.service;
 import com.clodrock.sakabe.entity.SakaUser;
 import com.clodrock.sakabe.entity.Token;
 import com.clodrock.sakabe.enums.TokenType;
+import com.clodrock.sakabe.exception.InvalidAuthenticationException;
 import com.clodrock.sakabe.exception.NotFoundException;
 import com.clodrock.sakabe.exception.PasswordsDontMatchException;
 import com.clodrock.sakabe.exception.UserAlreadyExistException;
@@ -24,7 +25,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -113,7 +113,7 @@ public class AuthenticationService {
         final String refreshToken;
         final String userEmail;
         if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
-            return;
+            throw new InvalidAuthenticationException("Invalid Authentication Info!");
         }
         refreshToken = authHeader.substring(7);
         userEmail = jwtService.extractUsername(refreshToken);
