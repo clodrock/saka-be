@@ -13,6 +13,11 @@ import java.util.List;
 public class CommentController {
     private final CommentService commentService;
 
+    @GetMapping("/{boardId}")
+    public List<UserCommentResponse> getAllByBoardId(@PathVariable("boardId") String boardId) {
+        return commentService.getAllByBoardId(boardId);
+    }
+
     @GetMapping
     public List<UserCommentResponse> getAll() {
         return commentService.getAll();

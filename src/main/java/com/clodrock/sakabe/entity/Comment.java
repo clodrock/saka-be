@@ -18,4 +18,5 @@ public class Comment{
     @Enumerated
     private CommentType commentType;
     private Long userId;
+    private String boardId;
 }

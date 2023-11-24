@@ -53,7 +53,7 @@ public class BoardService {
         }).orElseThrow(()-> new NotFoundException("Board could not be found!"));
     }
 
-    public List<CreateBoardResponse> getUserInvolvedBoards(){
+    public List<CreateBoardResponse> getUserSubscribedBoards(){
         List<Board> boards = boardRepository.findBoardsByUser(authenticationService.getActiveUsername());
         if(boards.isEmpty()) throw new NotFoundException("Current user is not member to any board!");
         return boards.stream().map(boardMapper::toResponse).toList();
@@ -63,5 +63,14 @@ public class BoardService {
         List<Board> boards = boardRepository.findBoardsByOwner(authenticationService.getActiveUsername());
         if(boards.isEmpty()) throw new NotFoundException("Current user have not any board yet!");
         return boards.stream().map(boardMapper::toResponse).toList();
+    }
+
+    public void deleteBoard(String boardId) {
+        String activeUsername = authenticationService.getActiveUsername();
+
+        List<Board> boards = boardRepository.findByBoardCreator(activeUsername);
+
+        if(boards.isEmpty() || boards.stream().noneMatch(p-> p.getBoardId().equals(boardId)))
+            throw new NotFoundException("Board not found or user have not permission to delete this board!");
     }
 }

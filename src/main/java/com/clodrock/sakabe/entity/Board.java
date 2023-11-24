@@ -28,6 +28,7 @@ public class Board {
     )
     private List<SakaUser> ownerList;
 
+    private String boardCreator;
 
     @ManyToMany
     @JoinTable(

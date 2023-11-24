@@ -25,9 +25,22 @@ public class CommentService {
         return mapper.toUserComment(save);
     }
 
+    public List<UserCommentResponse> getAllByBoardId(String boardId) {
+        List<Comment> comments = repository.findAllByBoardId(boardId);
+
+        if(comments.isEmpty())
+            throw new NotFoundException("No comment has been found!");
+
+        return comments.stream().map(mapper::toUserComment).toList();
+    }
+
     public List<UserCommentResponse> getAll() {
-        List<Comment> all = repository.findAll();
-        return all.stream().map(mapper::toUserComment).toList();
+        List<Comment> comments = repository.findAll();
+
+        if(comments.isEmpty())
+            throw new NotFoundException("No comment has been found!");
+
+        return comments.stream().map(mapper::toUserComment).toList();
     }
 
     public void deleteById(Long commentId) {
