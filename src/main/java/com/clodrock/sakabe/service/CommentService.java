@@ -19,7 +19,7 @@ public class CommentService {
     private final CommentRepository repository;
     private final CommentMapper mapper;
 
-    public UserCommentResponse saveComment(SocketIOClient client, UserCommentRequest comment) {
+    public UserCommentResponse saveComment(UserCommentRequest comment) {
 
         Comment save = repository.save(mapper.toComment(comment));
         return mapper.toUserComment(save);
@@ -58,6 +58,6 @@ public class CommentService {
 
     public UserCommentResponse findById(Long id) {
         Optional<Comment> comment = repository.findById(id);
-        return comment.map(mapper::toUserComment).orElseThrow(()-> new NotFoundException("Comment bulunamadı!"));
+        return comment.map(mapper::toUserComment).orElseThrow(()-> new NotFoundException("Comment not found!"));
     }
 }

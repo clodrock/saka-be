@@ -2,11 +2,13 @@ package com.clodrock.sakabe.service;
 
 import com.clodrock.sakabe.entity.Board;
 import com.clodrock.sakabe.entity.SakaUser;
+import com.clodrock.sakabe.exception.InvalidAuthenticationException;
 import com.clodrock.sakabe.exception.NotFoundException;
 import com.clodrock.sakabe.mapper.BoardMapper;
 import com.clodrock.sakabe.model.AddUserRequest;
 import com.clodrock.sakabe.model.CreateBoardResponse;
 import com.clodrock.sakabe.repository.BoardRepository;
+import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final AuthenticationService authenticationService;
+    private final JwtService jwtService;
     private final UserService userService;
     private final BoardMapper boardMapper;
 
@@ -28,6 +31,9 @@ public class BoardService {
         String currentUser = authenticationService.getActiveUsername();
         request.getOwnerList().add(currentUser);
         request.getUserList().add(currentUser);
+
+        //TODO : burası distinct hale getirilmeli.
+        request.getUserList().addAll(request.getOwnerList());
 
         List<SakaUser> userList = userService.findUsersByEmailList(request.getUserList());
         List<SakaUser> ownerList = userService.findUsersByEmailList(request.getOwnerList());
@@ -72,5 +78,25 @@ public class BoardService {
 
         if(boards.isEmpty() || boards.stream().noneMatch(p-> p.getBoardId().equals(boardId)))
             throw new NotFoundException("Board not found or user have not permission to delete this board!");
+    }
+
+    public boolean isUserMemberOfBoard(String board, String jwtToken) {
+        checkToken(jwtToken);
+        String trimmedToken = jwtToken.substring(7);
+        String username = jwtService.extractUsername(trimmedToken);
+
+        checkToken(username);
+
+        List<Board> boards = boardRepository.findBoardsByUser(username);
+
+        if(boards.isEmpty())
+            throw new InvalidAuthenticationException("Current user is not member to any board!");
+
+        return boards.stream().anyMatch(p -> p.getBoardId().equals(board));
+    }
+
+    private void checkToken(String token) {
+        if(StringUtils.isEmpty(token))
+            throw new InvalidAuthenticationException("User is not valid!");
     }
 }

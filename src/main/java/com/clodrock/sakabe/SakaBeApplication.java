@@ -21,6 +21,8 @@ public class SakaBeApplication {
 			AuthenticationService service
 	) {
 		return args -> {
+
+			/*
 			var admin = RegisterRequest.builder()
 					.firstname("Samet")
 					.lastname("Topakkaya")
@@ -39,6 +41,7 @@ public class SakaBeApplication {
 					.build();
 			System.out.println("Manager token: " + service.register(manager).getAccessToken());
 
+			//System.out.println(service.getAdminToken());
 		};
 	}*/
 }

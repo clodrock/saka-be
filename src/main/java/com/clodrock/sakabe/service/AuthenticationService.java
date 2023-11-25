@@ -1,5 +1,6 @@
 package com.clodrock.sakabe.service;
 
+import com.clodrock.sakabe.configuration.JwtAuthenticationFilter;
 import com.clodrock.sakabe.entity.SakaUser;
 import com.clodrock.sakabe.entity.Token;
 import com.clodrock.sakabe.enums.TokenType;
@@ -25,6 +26,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final JwtAuthenticationFilter authenticationFilter;
 
     public AuthenticationResponse register(RegisterRequest request) {
         repository.findByEmail(request.getEmail())
@@ -41,7 +46,7 @@ public class AuthenticationService {
                     throw new UserAlreadyExistException("User already exists!");
                 });
 
-        if(!request.getPassword().equals(request.getPasswordAgain()))
+        if(!request.getPassword().equals(request.getConfirmationPassword()))
             throw new PasswordsDontMatchException("Passwords don't match!");
 
         var user = SakaUser.builder()
@@ -64,19 +69,24 @@ public class AuthenticationService {
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         var user = repository.findByEmail(request.getEmail())
-                .orElseThrow(()-> new NotFoundException("Username or email is not correct!"));
+                .orElseThrow(()-> new NotFoundException("Username or password is not correct!"));
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+        } catch (Exception exception) {
+            throw new InvalidAuthenticationException("Username or password is not correct!");
+        }
 
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
+        authenticationFilter.registerSecurityContextHolder(jwtToken, null);
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
@@ -140,6 +150,15 @@ public class AuthenticationService {
 
     public String getActiveUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getName();
+        return Objects.nonNull(authentication) ? authentication.getName() : "";
+    }
+
+    public String getAdminToken() {
+        Optional<SakaUser> sakaUser = repository.findByEmail("admin@saka.com");
+        SakaUser admin = sakaUser.get();
+        return tokenRepository.findAllValidTokenByUser(admin.getId())
+                .stream()
+                .sorted(Comparator.comparing(Token::getId).reversed())
+                .toList().get(0).getToken();
     }
 }
