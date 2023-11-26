@@ -57,6 +57,8 @@ public class AuthenticationService {
                 .role(request.getRole())
                 .build();
 
+        repository.save(user);
+
         var jwtToken = jwtService.generateToken(user);
 
         var refreshToken = jwtService.generateRefreshToken(user);

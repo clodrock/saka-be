@@ -18,4 +18,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     List<Board> findBoardsByOwner(@Param("username") String username);
 
     List<Board> findByBoardCreator(String userName);
+
+    Optional<Board> findByName(String boardName);
 }

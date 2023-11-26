@@ -1,5 +1,7 @@
 package com.clodrock.sakabe.service;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateBoardRequest {
-    private String boardName;
-    private List<String> userList;
-    private List<String> ownerList;
+    private @NotBlank(message = "boardName cannot be empty") String boardName;
+    private @NotEmpty(message = "userList cannot be empty!") List<String> userList;
+    private @NotEmpty(message = "ownerList cannot be empty!") List<String> ownerList;
 }

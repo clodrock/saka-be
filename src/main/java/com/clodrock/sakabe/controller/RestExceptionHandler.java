@@ -2,6 +2,8 @@ package com.clodrock.sakabe.controller;
 
 import com.clodrock.sakabe.exception.InvalidAuthenticationException;
 import com.clodrock.sakabe.exception.NotFoundException;
+import com.clodrock.sakabe.exception.PasswordsDontMatchException;
+import com.clodrock.sakabe.exception.UserAlreadyExistException;
 import com.clodrock.sakabe.model.ExceptionMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,5 +62,25 @@ public class RestExceptionHandler {
                         .message(String.join(",", errors))
                         .build()
         );
+    }
+
+    @ExceptionHandler(UserAlreadyExistException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ExceptionMessage> handleUserAlreadyExistException(UserAlreadyExistException exception) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ExceptionMessage.builder()
+                        .error(true)
+                        .message(exception.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(PasswordsDontMatchException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ExceptionMessage> handlePasswordException(PasswordsDontMatchException exception) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ExceptionMessage.builder()
+                        .error(true)
+                        .message(exception.getMessage())
+                        .build());
     }
 }

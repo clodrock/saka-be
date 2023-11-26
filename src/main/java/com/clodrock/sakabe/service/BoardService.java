@@ -2,6 +2,7 @@ package com.clodrock.sakabe.service;
 
 import com.clodrock.sakabe.entity.Board;
 import com.clodrock.sakabe.entity.SakaUser;
+import com.clodrock.sakabe.exception.AlreadyExistException;
 import com.clodrock.sakabe.exception.InvalidAuthenticationException;
 import com.clodrock.sakabe.exception.NotFoundException;
 import com.clodrock.sakabe.mapper.BoardMapper;
@@ -28,11 +29,14 @@ public class BoardService {
 
 
     public CreateBoardResponse createBoard(CreateBoardRequest request){
+        if(boardRepository.findByName(request.getBoardName())
+                .isPresent())
+            throw new AlreadyExistException("Board already exist with board name " + request.getBoardName());
+
         String currentUser = authenticationService.getActiveUsername();
         request.getOwnerList().add(currentUser);
         request.getUserList().add(currentUser);
 
-        //TODO : burası distinct hale getirilmeli.
         request.getUserList().addAll(request.getOwnerList());
 
         List<SakaUser> userList = userService.findUsersByEmailList(request.getUserList());
@@ -42,7 +46,9 @@ public class BoardService {
                 .boardId(UUID.randomUUID().toString())
                 .name(request.getBoardName())
                 .ownerList(ownerList)
-                .userList(userList).build();
+                .userList(userList)
+                .boardCreator(currentUser)
+                .build();
 
         Board createdBoard = boardRepository.save(board);
         return boardMapper.toResponse(createdBoard);

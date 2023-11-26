@@ -41,9 +41,11 @@ public class SocketService {
 
     private DataListener<UserCommentRequest> onCommentReceived() {
         return (senderClient, data, ackSender) -> {
+            String boardIdParam = getBoardIdParam(senderClient);
+            data.setBoardId(boardIdParam);
             var userCommentResponse = commentService.saveComment(data);
             data.setId(userCommentResponse.getId());
-            sendSocketMessage(senderClient,data, "get_message", getBoardIdParam(senderClient));
+            sendSocketMessage(senderClient,data, "get_message", boardIdParam);
         };
     }
 
