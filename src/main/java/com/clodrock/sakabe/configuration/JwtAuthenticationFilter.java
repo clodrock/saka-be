@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,13 +30,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     private final TokenRepository tokenRepository;
 
+    private static final List<String> WHITELIST = List.of("/api/v1/auth/*", "/mail/sendMail", "/api/v1/captcha/*");
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        if (request.getServletPath().contains("/api/v1/auth/*")) {
+
+        if (checkWhiteList(request.getServletPath())) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -47,6 +51,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
         registerSecurityContextHolder(jwt, request);
         filterChain.doFilter(request, response);
+    }
+
+    private boolean checkWhiteList(String servletPath) {
+        boolean isValid = false;
+        for (String s : WHITELIST) {
+            if (servletPath.contains(s)) {
+                isValid = true;
+                break;
+            }
+        }
+        return isValid;
     }
 
     public void registerSecurityContextHolder(String jwt, HttpServletRequest request) {

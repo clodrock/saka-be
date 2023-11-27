@@ -26,9 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +53,7 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
+                //.isActive(false)
                 .build();
 
         repository.save(user);
@@ -153,14 +152,5 @@ public class AuthenticationService {
     public String getActiveUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return Objects.nonNull(authentication) ? authentication.getName() : "";
-    }
-
-    public String getAdminToken() {
-        Optional<SakaUser> sakaUser = repository.findByEmail("admin@saka.com");
-        SakaUser admin = sakaUser.get();
-        return tokenRepository.findAllValidTokenByUser(admin.getId())
-                .stream()
-                .sorted(Comparator.comparing(Token::getId).reversed())
-                .toList().get(0).getToken();
     }
 }
