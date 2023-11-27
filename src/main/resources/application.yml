@@ -6,8 +6,24 @@ server:
   port: 8080
 
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: sakaretroweb@gmail.com
+    password: kscp rjqo snzl raph
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+            required: true
+          auth: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
   datasource:
-    url: jdbc:postgresql://my_postgres:5432/comment
+    url: jdbc:postgresql://localhost:5432/comment
     username: postgres
     password: mysecretpassword
   jpa:
@@ -16,6 +32,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
+
 socket:
-  host : 172.19.0.3
+  host : localhost
   port : 8092

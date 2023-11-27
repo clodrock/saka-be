@@ -4,6 +4,7 @@ import com.clodrock.sakabe.enums.Role;
 import jakarta.persistence.*;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,6 +40,8 @@ public class SakaUser implements UserDetails {
 
     @ManyToMany(mappedBy = "ownerList")
     private List<Board> ownership;
+
+    //private boolean isActive;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
