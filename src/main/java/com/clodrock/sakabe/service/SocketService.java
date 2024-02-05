@@ -29,6 +29,7 @@ public class SocketService {
         socketIoServer.addEventListener("send_message", UserCommentRequest.class, onCommentReceived());
         socketIoServer.addEventListener("delete_message", UserCommentRequest.class, onCommentDeleted());
         socketIoServer.addEventListener("update_message", UserCommentRequest.class, onCommentUpdated());
+        System.out.println("Sistem ayağa kalkıyor!");
     }
 
     public void sendSocketMessage(SocketIOClient senderClient, UserCommentRequest userCommentRequest, String streamType, String boardId) {
@@ -50,7 +51,7 @@ public class SocketService {
     }
 
     private String getBoardIdParam(SocketIOClient senderClient) {
-        return senderClient.getHandshakeData().getUrlParams().get("boardId").get(0);
+        return senderClient.getHandshakeData().getSingleUrlParam("boardId");
     }
 
     private DataListener<UserCommentRequest> onCommentDeleted() {
@@ -75,15 +76,15 @@ public class SocketService {
 
     private ConnectListener onConnected() {
         return (client) -> {
-            var params = client.getHandshakeData().getUrlParams();
-            String jwtToken = client.getHandshakeData().getHttpHeaders().get("Authorization");
-            String board = params.get("boardId").get(0);
+            String jwtToken = client.getHandshakeData().getSingleUrlParam("Authorization");
+            String board = client.getHandshakeData().getSingleUrlParam("boardId");
 
             boolean isUserMemberOfBoard;
 
             try {
                 isUserMemberOfBoard = boardService.isUserMemberOfBoard(board, jwtToken);
             }catch (Exception e) {
+                log.info("Username : boardId {},{}", jwtToken, board);
                 log.info("User is not belong to this board! {}, {}", client.getSessionId().toString(), board);
                 client.disconnect();
                 return;
@@ -91,6 +92,7 @@ public class SocketService {
 
             if(!isUserMemberOfBoard)
             {
+                log.info("Username : boardId {},{}", jwtToken, board);
                 log.info("User is not belong to this board! {}, {}", client.getSessionId().toString(), board);
                 client.disconnect();
                 return;
