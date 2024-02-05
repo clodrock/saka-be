@@ -23,7 +23,7 @@ spring:
           writetimeout: 5000
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/comment
+    url: jdbc:postgresql://my_postgres:5432/comment
     username: postgres
     password: mysecretpassword
   jpa:
@@ -34,5 +34,5 @@ spring:
       ddl-auto: update
 
 socket:
-  host : localhost
+  host : 0.0.0.0
   port : 8092

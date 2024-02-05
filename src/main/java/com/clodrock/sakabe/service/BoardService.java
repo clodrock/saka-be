@@ -11,6 +11,7 @@ import com.clodrock.sakabe.model.CreateBoardResponse;
 import com.clodrock.sakabe.repository.BoardRepository;
 import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class BoardService {
 
     private final BoardRepository boardRepository;
@@ -67,13 +69,13 @@ public class BoardService {
 
     public List<CreateBoardResponse> getUserSubscribedBoards(){
         List<Board> boards = boardRepository.findBoardsByUser(authenticationService.getActiveUsername());
-        if(boards.isEmpty()) throw new NotFoundException("Current user is not member to any board!");
+        if(boards.isEmpty()) log.info("Current user is not member to any board!");
         return boards.stream().map(boardMapper::toResponse).toList();
     }
 
     public List<CreateBoardResponse> getUserOwnedBoards(){
         List<Board> boards = boardRepository.findBoardsByOwner(authenticationService.getActiveUsername());
-        if(boards.isEmpty()) throw new NotFoundException("Current user have not any board yet!");
+        if(boards.isEmpty()) log.info("Current user have not any board yet, username" + authenticationService.getActiveUsername());
         return boards.stream().map(boardMapper::toResponse).toList();
     }
 
