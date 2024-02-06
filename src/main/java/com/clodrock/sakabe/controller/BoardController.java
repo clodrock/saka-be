@@ -4,7 +4,7 @@ import com.clodrock.sakabe.model.AddUserRequest;
 import com.clodrock.sakabe.model.CreateBoardResponse;
 import com.clodrock.sakabe.model.SuccessResponse;
 import com.clodrock.sakabe.service.BoardService;
-import com.clodrock.sakabe.service.CreateBoardRequest;
+import com.clodrock.sakabe.model.CreateBoardRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

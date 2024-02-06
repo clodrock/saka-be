@@ -6,16 +6,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/comment")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200")
-public class CommentController {
+public class UserCommentController {
     private final CommentService commentService;
 
     @GetMapping("/{boardId}")
-    public List<UserCommentResponse> getAllByBoardId(@PathVariable("boardId") String boardId) {
+    public List<UserCommentResponse> getAllByBoardId(@PathVariable("boardId") UUID boardId) {
         return commentService.getAllByBoardId(boardId);
     }
 

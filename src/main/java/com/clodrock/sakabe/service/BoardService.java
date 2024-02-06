@@ -7,6 +7,7 @@ import com.clodrock.sakabe.exception.InvalidAuthenticationException;
 import com.clodrock.sakabe.exception.NotFoundException;
 import com.clodrock.sakabe.mapper.BoardMapper;
 import com.clodrock.sakabe.model.AddUserRequest;
+import com.clodrock.sakabe.model.CreateBoardRequest;
 import com.clodrock.sakabe.model.CreateBoardResponse;
 import com.clodrock.sakabe.repository.BoardRepository;
 import io.micrometer.common.util.StringUtils;
@@ -45,7 +46,6 @@ public class BoardService {
         List<SakaUser> ownerList = userService.findUsersByEmailList(request.getOwnerList());
 
         Board board = Board.builder()
-                .boardId(UUID.randomUUID().toString())
                 .name(request.getBoardName())
                 .ownerList(ownerList)
                 .userList(userList)
@@ -58,7 +58,7 @@ public class BoardService {
 
     public CreateBoardResponse addUser(AddUserRequest request) {
         List<SakaUser> usersByEmailList = userService.findUsersByEmailList(request.getEmailList());
-        Optional<Board> board = boardRepository.findByBoardId(request.getBoardId());
+        Optional<Board> board = boardRepository.findById(request.getBoardId());
 
         return board.map(b-> {
             b.getUserList().addAll(usersByEmailList);
@@ -84,7 +84,7 @@ public class BoardService {
 
         List<Board> boards = boardRepository.findByBoardCreator(activeUsername);
 
-        if(boards.isEmpty() || boards.stream().noneMatch(p-> p.getBoardId().equals(boardId)))
+        if(boards.isEmpty() || boards.stream().noneMatch(p-> p.getId().equals(boardId)))
             throw new NotFoundException("Board not found or user have not permission to delete this board!");
     }
 
@@ -100,7 +100,7 @@ public class BoardService {
         if(boards.isEmpty())
             throw new InvalidAuthenticationException("Current user is not member to any board!");
 
-        return boards.stream().anyMatch(p -> p.getBoardId().equals(board));
+        return boards.stream().anyMatch(p -> p.getId().equals(UUID.fromString(board)));
     }
 
     private void checkToken(String token) {

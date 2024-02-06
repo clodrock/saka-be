@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @RequiredArgsConstructor
@@ -14,11 +15,10 @@ import java.util.List;
 @SuperBuilder
 public class Board {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     private String name;
-    private String boardId;
 
     @ManyToMany
     @JoinTable(

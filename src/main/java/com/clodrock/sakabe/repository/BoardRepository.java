@@ -7,10 +7,9 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public interface BoardRepository extends JpaRepository<Board, Long> {
-    Optional<Board> findByBoardId(String boardId);
-
+public interface BoardRepository extends JpaRepository<Board, UUID> {
     @Query("SELECT b FROM Board b JOIN b.userList o WHERE o.email = :username")
     List<Board> findBoardsByUser(@Param("username") String username);
 

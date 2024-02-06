@@ -15,7 +15,8 @@ import java.util.UUID;
 public class UserCommentRequest {
     private String content;
     private CommentType commentType;
-    private Long userId;
+    private UUID userId;
     private Long id;
-    private String boardId;
+    private UUID boardId;
+    private Long parentId;
 }

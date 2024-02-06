@@ -10,7 +10,7 @@ import org.mapstruct.MappingConstants;
 public interface BoardMapper {
     default CreateBoardResponse toResponse(Board board){
         return CreateBoardResponse.builder()
-                .boardId(board.getBoardId())
+                .boardId(board.getId())
                 .boardName(board.getName())
                 .boardUsers(board.getUserList().stream().map(SakaUser::getEmail).toList())
                 .boardOwners(board.getOwnerList().stream().map(SakaUser::getEmail).toList())

@@ -1,4 +1,4 @@
-package com.clodrock.sakabe.service;
+package com.clodrock.sakabe.model;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
